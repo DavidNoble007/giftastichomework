@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Giftastic</title>
+  <style type="text/css">
+    button,
+    div,
+    form,
+    input
+     {
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- Rendered Buttons will get Dumped Here  -->
+    <div id="buttons-view"></div>
+
+    <form id="gif-form">
+      <label for="gif-input">Gif Search!</label>
+      <input type="text" id="gif-input">
+      <br>
+
+      <!-- Button triggers new gif to be added -->
+    </form>
+    <button id="add-gif" type="submit" value="Gif Search!">Add</button>
+
+    <!-- gifs will Get Dumped Here -->
+    <div id="gif-view"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      // Initial array of gifs
+      var animals = ["bears", "dogs", "vultures", "deer"];
+
+      // displayGifs function re-renders the HTML to display the appropriate content
+      function displayGifs() {
+        console.log("hello");
+        var animal = $(this).data("name");
+        console.log("this is our button", animal)
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+          animal + "&api_key=uDsG93oHViZ8EJzKhEkM1sCWH0c7M3Dk&limit=10";
+
+        // Creating an AJAX call for the specific animal button being clicked
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+
+          .then(function (response) {
+
+
+            // storing the data from the AJAX request in the results variable
+            var results = response.data;
+            console.log("results response", results);
+
+
+            // Creating a div to hold the animal gif
+            var animalgifDiv = $("<div>");
+
+            // Creating and storing an image tag
+            for (var i = 0; i < results.length; i++) {
+              var animalImage = $("<img>");
+              // Setting the src attribute of the image to a property pulled off the result item
+              animalImage.attr("src", results[i].images.fixed_height.url);
+              // animalImage.attr("data-still", results[i].images.fixed_height_still.url);
+              animalgifDiv.append(animalImage);
+              console.log(animalgifDiv)
+              // Prependng the animalgifDiv to the HTML page in the "#gifs-appear-here" div
+              $("#gif-view").prepend(animalgifDiv);
+            }
+          })
+      }
+      // on click event for animation
+      function renderButtons() {
+
+        $("#buttons-view").empty();
+        for (var i = 0; i < animals.length; i++) {
+          var button = $("<button>");
+          button.text(animals[i]);
+          button.attr("id", "gif-button");
+          button.data("name", animals[i])
+          $("#buttons-view").append(button);
+        }
+      }
+
+      renderButtons()
+      $(document).on("click", "#gif-button", displayGifs)
+      $("#add-gif").on("click", function () {
+        console.log($("#gif-input").val())
+        animals.push($("#gif-input").val())
+        renderButtons()
+
+      })
+    </script>
+  </div>
+</body>
+
+</html>
